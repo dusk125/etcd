@@ -35,5 +35,3 @@ require (
 	google.golang.org/grpc v1.38.0
 	gopkg.in/cheggaaa/pb.v1 v1.0.28
 )
-
-go 1.13
