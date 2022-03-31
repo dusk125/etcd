@@ -22,8 +22,8 @@ import (
 func TestEtcd(t *testing.T) {
 	e := &Etcd{
 		Name:    "s1",
-		DataDir: "/tmp/etcd-functionl-1/etcd.data",
-		WALDir:  "/tmp/etcd-functionl-1/etcd.data/member/wal",
+		DataDir: "/Users/mustafa/workspace/go/src/etcd/etcd/test-temp/etcd-functionl-1/etcd.data",
+		WALDir:  "/Users/mustafa/workspace/go/src/etcd/etcd/test-temp/etcd-functionl-1/etcd.data/member/wal",
 
 		HeartbeatIntervalMs: 100,
 		ElectionTimeoutMs:   1000,
@@ -55,7 +55,7 @@ func TestEtcd(t *testing.T) {
 		InitialCorruptCheck: true,
 
 		Logger:             "zap",
-		LogOutputs:         []string{"/tmp/etcd-functional-1/etcd.log"},
+		LogOutputs:         []string{"/Users/mustafa/workspace/go/src/etcd/etcd/test-temp/etcd-functional-1/etcd.log"},
 		LogLevel:           "info",
 		SocketReuseAddress: true,
 		SocketReusePort:    true,
@@ -63,8 +63,8 @@ func TestEtcd(t *testing.T) {
 
 	exps := []string{
 		"--name=s1",
-		"--data-dir=/tmp/etcd-functionl-1/etcd.data",
-		"--wal-dir=/tmp/etcd-functionl-1/etcd.data/member/wal",
+		"--data-dir=/Users/mustafa/workspace/go/src/etcd/etcd/test-temp/etcd-functionl-1/etcd.data",
+		"--wal-dir=/Users/mustafa/workspace/go/src/etcd/etcd/test-temp/etcd-functionl-1/etcd.data/member/wal",
 		"--heartbeat-interval=100",
 		"--election-timeout=1000",
 		"--listen-client-urls=https://127.0.0.1:1379",
@@ -83,7 +83,7 @@ func TestEtcd(t *testing.T) {
 		"--pre-vote=true",
 		"--experimental-initial-corrupt-check=true",
 		"--logger=zap",
-		"--log-outputs=/tmp/etcd-functional-1/etcd.log",
+		"--log-outputs=/Users/mustafa/workspace/go/src/etcd/etcd/test-temp/etcd-functional-1/etcd.log",
 		"--log-level=info",
 		"--socket-reuse-address=true",
 		"--socket-reuse-port=true",

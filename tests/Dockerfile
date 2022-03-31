@@ -42,10 +42,8 @@ RUN rm -rf ${GOROOT} \
 RUN mkdir -p ${GOPATH}/src/go.etcd.io/etcd
 WORKDIR ${GOPATH}/src/go.etcd.io/etcd
 
-ADD ./scripts/install-marker.sh /tmp/install-marker.sh
 
-RUN GO111MODULE=off go get github.com/myitcv/gobin
-RUN /tmp/install-marker.sh amd64 \
-  && rm -f /tmp/install-marker.sh \
+RUN /Users/mustafa/workspace/go/src/etcd/etcd/test-temp/install-marker.sh amd64 \
+  && rm -f /Users/mustafa/workspace/go/src/etcd/etcd/test-temp/install-marker.sh \
   && curl -s https://codecov.io/bash >/codecov \
   && chmod 700 /codecov

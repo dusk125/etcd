@@ -1,5 +1,5 @@
 #!/bin/sh
-rm -rf /tmp/m1.data /tmp/m2.data /tmp/m3.data /tmp/proxy.data
+rm -rf /Users/mustafa/workspace/go/src/etcd/etcd/test-temp/m1.data /Users/mustafa/workspace/go/src/etcd/etcd/test-temp/m2.data /Users/mustafa/workspace/go/src/etcd/etcd/test-temp/m3.data /Users/mustafa/workspace/go/src/etcd/etcd/test-temp/proxy.data
 
 goreman -f /certs-metrics-proxy/Procfile start &
 

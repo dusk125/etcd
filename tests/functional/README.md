@@ -204,7 +204,7 @@ Trigger leader election
 $ ./build.sh
 $ make build-functional
 
-$ rm -rf /tmp/etcd-proxy-data.s*
+$ rm -rf /Users/mustafa/workspace/go/src/etcd/etcd/test-temp/etcd-proxy-data.s*
 $ goreman -f ./functional/Procfile-proxy start
 
 $ ETCDCTL_API=3 ./bin/etcdctl \
