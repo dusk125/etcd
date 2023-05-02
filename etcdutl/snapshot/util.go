@@ -20,12 +20,23 @@ import (
 
 type revision struct {
 	main int64
+	sep  byte
 	sub  int64
 }
 
+// The binary representation of the revision is 17 bytes:
+//
+// [8 bytes: main] [1 byte: sep] [8 bytes: sub]
 func bytesToRev(bytes []byte) revision {
 	return revision{
 		main: int64(binary.BigEndian.Uint64(bytes[0:8])),
+		sep:  bytes[8],
 		sub:  int64(binary.BigEndian.Uint64(bytes[9:])),
 	}
+}
+
+func revToBytes(bytes []byte, rev revision) {
+	binary.BigEndian.PutUint64(bytes[0:8], uint64(rev.main))
+	bytes[8] = rev.sep
+	binary.BigEndian.PutUint64(bytes[9:], uint64(rev.sub))
 }

@@ -30,7 +30,7 @@ import (
 	"go.etcd.io/etcd/api/v3/etcdserverpb"
 	"go.etcd.io/etcd/client/pkg/v3/fileutil"
 	"go.etcd.io/etcd/client/pkg/v3/types"
-	"go.etcd.io/etcd/client/v3"
+	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.etcd.io/etcd/client/v3/snapshot"
 	"go.etcd.io/etcd/raft/v3"
 	"go.etcd.io/etcd/raft/v3/raftpb"
@@ -194,6 +194,10 @@ type RestoreConfig struct {
 	// SkipHashCheck is "true" to ignore snapshot integrity hash value
 	// (required if copied from data directory).
 	SkipHashCheck bool
+
+	// RevisionBump is the amount, if any, to increase each key's revision by to force
+	//	watchers to resync after restore.
+	RevisionBump int64
 }
 
 // Restore restores a new etcd data directory from given snapshot file.
@@ -257,6 +261,11 @@ func (s *v3Manager) Restore(cfg RestoreConfig) error {
 	if err = s.saveDB(); err != nil {
 		return err
 	}
+
+	if err = s.revBump(cfg.RevisionBump); err != nil {
+		return err
+	}
+
 	hardstate, err := s.saveWALAndSnap()
 	if err != nil {
 		return err
@@ -295,12 +304,7 @@ func (s *v3Manager) saveDB() error {
 	be := backend.NewDefaultBackend(s.outDbPath())
 	defer be.Close()
 
-	err = membership.TrimMembershipFromBackend(s.lg, be)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return membership.TrimMembershipFromBackend(s.lg, be)
 }
 
 func (s *v3Manager) copyAndVerifyDB() error {

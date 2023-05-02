@@ -40,6 +40,7 @@ var (
 	restorePeerURLs     string
 	restoreName         string
 	skipHashCheck       bool
+	revisionBump        int64
 )
 
 // NewSnapshotCommand returns the cobra command for "snapshot".
@@ -89,6 +90,7 @@ func NewSnapshotRestoreCommand() *cobra.Command {
 	cmd.Flags().StringVar(&restorePeerURLs, "initial-advertise-peer-urls", defaultInitialAdvertisePeerURLs, "List of this member's peer URLs to advertise to the rest of the cluster")
 	cmd.Flags().StringVar(&restoreName, "name", defaultName, "Human-readable name for this member")
 	cmd.Flags().BoolVar(&skipHashCheck, "skip-hash-check", false, "Ignore snapshot integrity hash value (required if copied from data directory)")
+	cmd.Flags().Int64Var(&revisionBump, "revision-bump", 0, "How much to increase the revision of each key, after restore, to force a resync of watchers")
 
 	return cmd
 }
@@ -127,7 +129,7 @@ func snapshotStatusCommandFunc(cmd *cobra.Command, args []string) {
 func snapshotRestoreCommandFunc(cmd *cobra.Command, args []string) {
 	fmt.Fprintf(os.Stderr, "Deprecated: Use `etcdutl snapshot restore` instead.\n\n")
 	etcdutl.SnapshotRestoreCommandFunc(restoreCluster, restoreClusterToken, restoreDataDir, restoreWalDir,
-		restorePeerURLs, restoreName, skipHashCheck, args)
+		restorePeerURLs, restoreName, skipHashCheck, revisionBump, args)
 }
 
 func initialClusterFromName(name string) string {
