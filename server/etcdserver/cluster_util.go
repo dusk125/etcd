@@ -17,9 +17,12 @@ package etcdserver
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
+	"maps"
 	"net/http"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -74,6 +77,10 @@ func getClusterFromRemotePeers(lg *zap.Logger, urls []string, timeout time.Durat
 			return http.ErrUseLastResponse
 		},
 	}
+
+	var clusters = make(map[string]*membership.RaftCluster)
+	var errs []error
+
 	for _, u := range urls {
 		addr := u + "/members"
 		resp, err := cc.Get(addr)
@@ -81,6 +88,7 @@ func getClusterFromRemotePeers(lg *zap.Logger, urls []string, timeout time.Durat
 			if logerr {
 				lg.Warn("failed to get cluster response", zap.String("address", addr), zap.Error(err))
 			}
+			errs = append(errs, err)
 			continue
 		}
 		b, err := ioutil.ReadAll(resp.Body)
@@ -89,6 +97,7 @@ func getClusterFromRemotePeers(lg *zap.Logger, urls []string, timeout time.Durat
 			if logerr {
 				lg.Warn("failed to read body of cluster response", zap.String("address", addr), zap.Error(err))
 			}
+			errs = append(errs, err)
 			continue
 		}
 		var membs []*membership.Member
@@ -96,31 +105,44 @@ func getClusterFromRemotePeers(lg *zap.Logger, urls []string, timeout time.Durat
 			if logerr {
 				lg.Warn("failed to unmarshal cluster response", zap.String("address", addr), zap.Error(err))
 			}
+			errs = append(errs, err)
 			continue
 		}
-		id, err := types.IDFromString(resp.Header.Get("X-Etcd-Cluster-ID"))
+		idStr := resp.Header.Get("X-Etcd-Cluster-ID")
+		id, err := types.IDFromString(idStr)
 		if err != nil {
 			if logerr {
 				lg.Warn(
 					"failed to parse cluster ID",
 					zap.String("address", addr),
-					zap.String("header", resp.Header.Get("X-Etcd-Cluster-ID")),
+					zap.String("header", idStr),
 					zap.Error(err),
 				)
 			}
+			errs = append(errs, err)
 			continue
 		}
-
-		// check the length of membership members
-		// if the membership members are present then prepare and return raft cluster
-		// if membership members are not present then the raft cluster formed will be
-		// an invalid empty cluster hence return failed to get raft cluster member(s) from the given urls error
 		if len(membs) > 0 {
-			return membership.NewClusterFromMembers(lg, id, membs), nil
+			clusters[id.String()] = membership.NewClusterFromMembers(lg, id, membs)
 		}
-		return nil, fmt.Errorf("failed to get raft cluster member(s) from the given URLs")
 	}
-	return nil, fmt.Errorf("could not retrieve cluster information from the given URLs")
+
+	if len(clusters) == 0 {
+		return nil, fmt.Errorf("could not retrieve cluster information from the given URLs: %v", errs)
+	}
+	if len(clusters) > 1 {
+		lg.Warn("disagreement on cluster ID among peers", zap.Strings("clusterIDs", keys(clusters)))
+		return nil, fmt.Errorf("disagreement on cluster ID among peers: %v", keys(clusters))
+	}
+	// Only one cluster ID found
+	for _, cl := range clusters {
+		return cl, nil
+	}
+	return nil, errors.New("unexpected error in cluster discovery")
+}
+
+func keys(m map[string]*membership.RaftCluster) []string {
+	return slices.Collect(maps.Keys(m))
 }
 
 // getRemotePeerURLs returns peer urls of remote members in the cluster. The

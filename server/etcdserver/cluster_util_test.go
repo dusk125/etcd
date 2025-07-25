@@ -15,8 +15,13 @@
 package etcdserver
 
 import (
+	"errors"
+	"net/http"
+	"net/http/httptest"
 	"reflect"
+	"strings"
 	"testing"
+	"time"
 
 	"go.etcd.io/etcd/api/v3/version"
 	"go.etcd.io/etcd/client/pkg/v3/types"
@@ -263,4 +268,80 @@ func TestIsMatchedVersions(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestGetClusterFromRemotePeers_Disagreement(t *testing.T) {
+	lg := zap.NewNop()
+	urls := []string{"http://10.0.0.1", "http://10.0.0.2", "http://10.0.0.3"}
+
+	// Mock RoundTripper: two nodes agree, one disagrees
+	rt := roundTripperFunc(func(req *http.Request) (*http.Response, error) {
+		if req.URL.String() == "http://10.0.0.1/members" {
+			resp := httptest.NewRecorder()
+			resp.Header().Set("X-Etcd-Cluster-ID", "12345")
+			resp.Write([]byte(`[{"ID":1,"Name":"node1","PeerURLs":["http://10.0.0.1"]}]`))
+			return resp.Result(), nil
+		}
+		if req.URL.String() == "http://10.0.0.2/members" {
+			resp := httptest.NewRecorder()
+			resp.Header().Set("X-Etcd-Cluster-ID", "12345")
+			resp.Write([]byte(`[{"ID":2,"Name":"node2","PeerURLs":["http://10.0.0.2"]}]`))
+			return resp.Result(), nil
+		}
+		if req.URL.String() == "http://10.0.0.3/members" {
+			resp := httptest.NewRecorder()
+			resp.Header().Set("X-Etcd-Cluster-ID", "67890")
+			resp.Write([]byte(`[{"ID":3,"Name":"node3","PeerURLs":["http://10.0.0.3"]}]`))
+			return resp.Result(), nil
+		}
+		return nil, errors.New("not found")
+	})
+
+	_, err := getClusterFromRemotePeers(lg, urls, 2*time.Second, true, rt)
+	if err == nil || err.Error() == "" {
+		t.Fatalf("expected disagreement error, got nil")
+	}
+	if !strings.Contains(err.Error(), "disagreement on cluster ID") {
+		t.Errorf("expected disagreement error, got: %v", err)
+	}
+}
+
+func TestGetClusterFromRemotePeers_AllAgree(t *testing.T) {
+	lg := zap.NewNop()
+	urls := []string{"http://10.0.0.1", "http://10.0.0.2", "http://10.0.0.3"}
+
+	// Mock RoundTripper: all nodes agree on cluster ID
+	rt := roundTripperFunc(func(req *http.Request) (*http.Response, error) {
+		resp := httptest.NewRecorder()
+		resp.Header().Set("X-Etcd-Cluster-ID", "12345")
+		var nodeNum string
+		if req.URL.String() == "http://10.0.0.1/members" {
+			nodeNum = "1"
+		} else if req.URL.String() == "http://10.0.0.2/members" {
+			nodeNum = "2"
+		} else if req.URL.String() == "http://10.0.0.3/members" {
+			nodeNum = "3"
+		} else {
+			return nil, errors.New("not found")
+		}
+		resp.Write([]byte(`[{"ID":` + nodeNum + `,"Name":"node` + nodeNum + `","PeerURLs":["http://10.0.0.` + nodeNum + `"]}]`))
+		return resp.Result(), nil
+	})
+
+	cl, err := getClusterFromRemotePeers(lg, urls, 2*time.Second, true, rt)
+	if err != nil {
+		t.Fatalf("expected no error, got: %v", err)
+	}
+	if cl == nil {
+		t.Fatalf("expected valid cluster, got nil")
+	}
+	if cl.ID().String() != "12345" {
+		t.Errorf("expected cluster ID '12345', got: %v", cl.ID().String())
+	}
+}
+
+type roundTripperFunc func(*http.Request) (*http.Response, error)
+
+func (f roundTripperFunc) RoundTrip(req *http.Request) (*http.Response, error) {
+	return f(req)
 }
