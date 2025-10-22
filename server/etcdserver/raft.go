@@ -33,13 +33,9 @@ import (
 	"go.etcd.io/etcd/server/v3/config"
 	"go.etcd.io/etcd/server/v3/etcdserver/api/membership"
 	"go.etcd.io/etcd/server/v3/etcdserver/api/rafthttp"
-<<<<<<< HEAD
 	"go.etcd.io/etcd/server/v3/etcdserver/cindex"
-||||||| a17edfd59
-=======
 	"go.etcd.io/etcd/server/v3/mvcc/backend"
 	"go.etcd.io/etcd/server/v3/revbump"
->>>>>>> openshift-4.20
 	"go.etcd.io/etcd/server/v3/wal"
 	"go.etcd.io/etcd/server/v3/wal/walpb"
 	"go.uber.org/zap"
@@ -577,14 +573,7 @@ func restartNode(cfg config.ServerConfig, snapshot *raftpb.Snapshot) (types.ID, 
 	return id, cl, n, s, w
 }
 
-<<<<<<< HEAD
-func restartAsStandaloneNode(cfg config.ServerConfig, snapshot *raftpb.Snapshot, ci cindex.ConsistentIndexer) (types.ID, *membership.RaftCluster, raft.Node, *raft.MemoryStorage, *wal.WAL) {
-||||||| a17edfd59
-func restartAsStandaloneNode(cfg config.ServerConfig, snapshot *raftpb.Snapshot) (types.ID, *membership.RaftCluster, raft.Node, *raft.MemoryStorage, *wal.WAL) {
-=======
-func restartAsStandaloneNode(cfg config.ServerConfig, snapshot *raftpb.Snapshot, be backend.Backend) (types.ID,
-	*membership.RaftCluster, raft.Node, *raft.MemoryStorage, *wal.WAL) {
->>>>>>> openshift-4.20
+func restartAsStandaloneNode(cfg config.ServerConfig, snapshot *raftpb.Snapshot, ci cindex.ConsistentIndexer, be backend.Backend) (types.ID, *membership.RaftCluster, raft.Node, *raft.MemoryStorage, *wal.WAL) {
 	var walsnap walpb.Snapshot
 	if snapshot != nil {
 		walsnap.Index, walsnap.Term = snapshot.Metadata.Index, snapshot.Metadata.Term

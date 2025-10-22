@@ -540,13 +540,7 @@ func NewServer(cfg config.ServerConfig) (srv *EtcdServer, err error) {
 		if !cfg.ForceNewCluster {
 			id, cl, n, s, w = restartNode(cfg, snapshot)
 		} else {
-<<<<<<< HEAD
-			id, cl, n, s, w = restartAsStandaloneNode(cfg, snapshot, ci)
-||||||| a17edfd59
-			id, cl, n, s, w = restartAsStandaloneNode(cfg, snapshot)
-=======
-			id, cl, n, s, w = restartAsStandaloneNode(cfg, snapshot, be)
->>>>>>> openshift-4.20
+			id, cl, n, s, w = restartAsStandaloneNode(cfg, snapshot, ci, be)
 		}
 
 		cl.SetStore(st)
