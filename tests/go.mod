@@ -2,7 +2,7 @@ module go.etcd.io/etcd/tests/v3
 
 go 1.25.0
 
-toolchain go1.25.8
+toolchain go1.25.9
 
 replace (
 	go.etcd.io/etcd/api/v3 => ../api
@@ -28,14 +28,14 @@ require (
 	github.com/soheilhy/cmux v0.1.5
 	github.com/stretchr/testify v1.11.1
 	go.etcd.io/bbolt v1.4.3
-	go.etcd.io/etcd/api/v3 v3.6.10
-	go.etcd.io/etcd/client/pkg/v3 v3.6.10
+	go.etcd.io/etcd/api/v3 v3.6.11
+	go.etcd.io/etcd/client/pkg/v3 v3.6.11
 	go.etcd.io/etcd/client/v2 v2.305.20
-	go.etcd.io/etcd/client/v3 v3.6.10
-	go.etcd.io/etcd/etcdctl/v3 v3.6.10
-	go.etcd.io/etcd/etcdutl/v3 v3.6.10
-	go.etcd.io/etcd/pkg/v3 v3.6.10
-	go.etcd.io/etcd/server/v3 v3.6.10
+	go.etcd.io/etcd/client/v3 v3.6.11
+	go.etcd.io/etcd/etcdctl/v3 v3.6.11
+	go.etcd.io/etcd/etcdutl/v3 v3.6.11
+	go.etcd.io/etcd/pkg/v3 v3.6.11
+	go.etcd.io/etcd/server/v3 v3.6.11
 	go.etcd.io/gofail v0.2.0
 	go.etcd.io/raft/v3 v3.6.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.59.0
@@ -44,7 +44,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.40.0
 	go.opentelemetry.io/proto/otlp v1.5.0
 	go.uber.org/zap v1.27.0
-	golang.org/x/crypto v0.48.0
+	golang.org/x/crypto v0.49.0
 	golang.org/x/sync v0.20.0
 	golang.org/x/time v0.9.0
 	google.golang.org/grpc v1.79.3
@@ -96,9 +96,9 @@ require (
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.34.0 // indirect
 	go.opentelemetry.io/otel/metric v1.40.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	golang.org/x/net v0.51.0 // indirect
-	golang.org/x/sys v0.41.0 // indirect
-	golang.org/x/text v0.35.0 // indirect
+	golang.org/x/net v0.52.0 // indirect
+	golang.org/x/sys v0.42.0 // indirect
+	golang.org/x/text v0.36.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20251202230838-ff82c1b0f217 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20251202230838-ff82c1b0f217 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
