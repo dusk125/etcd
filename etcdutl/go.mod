@@ -94,3 +94,5 @@ require (
 	sigs.k8s.io/json v0.0.0-20211020170558-c049b76a60c6 // indirect
 	sigs.k8s.io/yaml v1.4.0 // indirect
 )
+
+replace go.etcd.io/bbolt => github.com/dusk125/bbolt v0.0.0-20260513200651-08f72092628f

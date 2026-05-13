@@ -90,3 +90,5 @@ replace (
 replace go.etcd.io/etcd => ./FORBIDDEN_DEPENDENCY
 
 replace go.etcd.io/tests/v3 => ./FORBIDDEN_DEPENDENCY
+
+replace go.etcd.io/bbolt => github.com/dusk125/bbolt v0.0.0-20260513200651-08f72092628f
